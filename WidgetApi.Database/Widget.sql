@@ -1,0 +1,6 @@
+﻿CREATE TABLE [dbo].[Widget]
+(
+	[ID] INT NOT NULL PRIMARY KEY IDENTITY, 
+    [Name] NVARCHAR(50) NULL, 
+    [Shape] NVARCHAR(50) NULL
+)
