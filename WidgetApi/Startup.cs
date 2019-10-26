@@ -21,7 +21,7 @@ namespace WidgetApi
         public IConfiguration Configuration { get; }
         public IWebHostEnvironment Environment { get; }
 
-        public void ConfigureServices(IServiceCollection services, IServiceProvider serviceProvider)
+        public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
                
@@ -34,11 +34,9 @@ namespace WidgetApi
                     .AddDbContext<WidgetContext>(o => o
                     .UseSqlite(cn));
 
-                var context = serviceProvider.GetService<WidgetContext>();
-
-                //var context = services
-                //    .BuildServiceProvider()
-                //    .GetService<WidgetContext>();
+#pragma warning disable ASP0000 // Do not call 'IServiceCollection.BuildServiceProvider' in 'ConfigureServices'
+                var context = services.BuildServiceProvider().GetService<WidgetContext>();
+#pragma warning restore ASP0000 // Do not call 'IServiceCollection.BuildServiceProvider' in 'ConfigureServices'
 
                 Data.Seed(context);
             }
