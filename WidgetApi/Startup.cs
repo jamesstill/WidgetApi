@@ -4,26 +4,27 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using System;
 using WidgetApi.EFCore;
 
 namespace WidgetApi
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration, IHostingEnvironment environment)
+        public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         {
             Configuration = configuration;
             Environment = environment;
         }
 
         public IConfiguration Configuration { get; }
-        public IHostingEnvironment Environment { get; }
+        public IWebHostEnvironment Environment { get; }
 
-        public void ConfigureServices(IServiceCollection services)
+        public void ConfigureServices(IServiceCollection services, IServiceProvider serviceProvider)
         {
-            services
-                .AddMvc()
-                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddControllers();
+               
 
             var cn = Configuration.GetConnectionString("DefaultConnection");
 
@@ -33,9 +34,11 @@ namespace WidgetApi
                     .AddDbContext<WidgetContext>(o => o
                     .UseSqlite(cn));
 
-                var context = services
-                    .BuildServiceProvider()
-                    .GetService<WidgetContext>();
+                var context = serviceProvider.GetService<WidgetContext>();
+
+                //var context = services
+                //    .BuildServiceProvider()
+                //    .GetService<WidgetContext>();
 
                 Data.Seed(context);
             }
@@ -47,7 +50,7 @@ namespace WidgetApi
             }
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
@@ -59,7 +62,11 @@ namespace WidgetApi
             }
 
             app.UseHttpsRedirection();
-            app.UseMvc();
+            app.UseRouting();
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+            });
         }
     }
 }

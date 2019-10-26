@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using Microsoft.ApplicationInsights;
-using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WidgetApi.EFCore;
@@ -12,12 +10,11 @@ using WidgetApi.Models;
 
 namespace WidgetApi.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     [ApiController]
     public class WidgetController : ControllerBase
     {
         private readonly WidgetContext _context;
-        private readonly TelemetryClient _telemetryClient;
 
         public WidgetController(WidgetContext context)
         {
@@ -26,8 +23,6 @@ namespace WidgetApi.Controllers
 
             _context.ChangeTracker.QueryTrackingBehavior =
                 QueryTrackingBehavior.NoTracking;
-
-            _telemetryClient = new TelemetryClient();
         }
 
         [HttpGet]
@@ -40,9 +35,6 @@ namespace WidgetApi.Controllers
 
             if (items == null || items.Count == 0)
             {
-                var message = "There are no widgets in the system!";
-                _telemetryClient.TrackTrace(message, SeverityLevel.Error);
-                _telemetryClient.TrackEvent("404");
                 return NotFound();
             }
 
